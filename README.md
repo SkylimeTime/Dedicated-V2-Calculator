@@ -1,5 +1,5 @@
 # Dedicated-V2-Damage-Calculator
-An alternative version of the TT-Damage-Calculator found [here](https://github.com/Vhou-Atroph/TT-Damage-Calculator)
+An alternative version of the TT-Damage-Calculator found [here](https://github.com/Vhou-Atroph/TT-Damage-Calculator)  
 Please check the original readme for more information
  
 This version is designed to only calculate damages for the four available levels of version 2.0 Cogs in Toontown Rewritten (9-12)  
