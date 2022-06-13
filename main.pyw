@@ -7,14 +7,14 @@ from mod import update_checker
 
 '''
 CONTRIBUTORS:
-- Vhou-Atroph
+- don't blame Vhou-Atroph for this disgusting version
 - BoggoTV
 '''
 
 #Window
 global window
 window=Tk()
-window.title("Toontown Damage Calculator")
+window.title("Dedicated V2 Damage Calculator")
 icon=PhotoImage(file="img/whole-cream-pie.png")
 window.iconphoto(True, icon)
 window.resizable(0,0)
@@ -26,16 +26,23 @@ global sqt_used
 global drp_used
 global trp_used
 global tot_dmg
+global v2_dmgs
 snd_used=list()
 trw_used=list()
 sqt_used=list()
 drp_used=list()
 trp_used=list()
 tot_dmg=0
+v2_dmgs=list()
+v2_dmgs.append(0)
+v2_dmgs.append(0)
+v2_dmgs.append(0)
+v2_dmgs.append(0)
 
 organic=IntVar()
 lured=IntVar()
 v2=IntVar()
+v2.set(1)
 pin_val=IntVar()
 dmg_down=StringVar()
 dmg_down.set('0%')
@@ -54,29 +61,12 @@ def calc_dmg(opt=""):
   local_lure=0
   if lured.get()==1: #Find out if lure is enabled. If it is, save a local variable.
     local_lure=1
-  if v2.get()==0:
-    if len(trp_used)==1 and lured.get()==1:
-      tot_dmg=tot_dmg+calculators.gag_calculator(trp_used,defense=trans_def(dmg_down.get()))
-      lured.set(0)
-    if len(snd_used)>0:
-      tot_dmg=tot_dmg+calculators.gag_calculator(snd_used,defense=trans_def(dmg_down.get()))
-      lured.set(0)
-    if len(trw_used)>0:
-      tot_dmg=tot_dmg+calculators.gag_calculator(trw_used,lured=lured.get(),defense=trans_def(dmg_down.get()))
-      lured.set(0)
-    if len(sqt_used)>0:
-      tot_dmg=tot_dmg+calculators.gag_calculator(sqt_used,lured=lured.get(),defense=trans_def(dmg_down.get()))
-      lured.set(0)
-    if len(drp_used)>0 and lured.get()==0:
-      tot_dmg=tot_dmg+calculators.gag_calculator(drp_used,defense=trans_def(dmg_down.get()))
-    #print("Total damage this round: "+str(tot_dmg))
-    dmg_indicator.configure(text=str(tot_dmg))
-    cog_health_ind_calc()
-    tot_dmg=0
-    def_btn.configure(state="normal")
-  else:
-    v2_calc()
-    def_btn.configure(state="disabled")
+  for lvl in range(9,13):
+    v2_calc(lvl)
+  dmg_indicator.configure(text=str("Lvl 9: "+str(v2_dmgs[0])+" Lvl 10: " +str(v2_dmgs[1])+" Lvl 11: "+str(v2_dmgs[2])+" Lvl 12: "+str(v2_dmgs[3])))
+  tot_dmg=0
+  def_btn.configure(state="disabled")
+  
   if local_lure==1:
     lured.set(1)
 
@@ -258,7 +248,7 @@ cog_calc=Button(hist,text="Show Health and\n SOS Cards")
 #Calculation results
 calc_results=Frame(col0)
 dmg_this_round=Label(calc_results,text="Damage this round:",font=('Arial',16,'normal'))
-dmg_indicator=Label(calc_results,text="0",font=('Arial',16,'bold'))
+dmg_indicator=Label(calc_results,text="Lvl 9: 0 Lvl 10: 0 Lvl 11: 0 Lvl 12: 0",font=('Arial',14,'bold'))
 cog_level_indicator=Label(calc_results,text="(level 0)",font=('Arial',8,'normal'))
 org_indicator=Label(calc_results,text="Organic = OFF",font=('Arial',10,'bold'))
 
@@ -370,14 +360,14 @@ def clear_inputs(opt=""):
     lur_info='yes'
   hist_box.configure(state=NORMAL)
   if v2.get()==1:
-    hist_box.insert('1.0',"--------\nCalculation finished!\nDamage calculated was: "+dmg_indicator.cget("text")+"\nDefense: V2.0"+"\nLure: "+lur_info+"\nWill kill: "+cog_level_indicator.cget("text")+"\n\n")
+    hist_box.insert('1.0',"--------\nCalculation finished!\nDamage calculated was: "+dmg_indicator.cget("text")+"\nDefense: V2.0"+"\nLure: "+lur_info+"\n\n")
   else:
     hist_box.insert('1.0',"--------\nCalculation finished!\nDamage calculated was: "+dmg_indicator.cget("text")+"\nDefense: "+dmg_down.get()+"\nLure: "+lur_info+"\nWill kill: "+cog_level_indicator.cget("text")+"\n\n")
   hist_box.configure(state=DISABLED)
   if def_lur_lock.get()=='No lock' or def_lur_lock.get()=='Lock lure':
     dmg_down.set('0%')
   lured.set(0)
-  v2.set(0)
+  v2.set(1)
   snd_used=list()
   trw_used=list()
   sqt_used=list()
@@ -387,7 +377,7 @@ def clear_inputs(opt=""):
   calc_dmg()
   for i in gag_btns:
     i.configure(text='0')
-  if local_lure==1 and def_lur_lock.get()=='Lock lure' or def_lur_lock.get()=='Lock both': #Use the local variable and def_lur_lock to lock lure as active even after it is set to 0 by clear_inputs()
+  if local_lure==1 and (def_lur_lock.get()=='Lock lure' or def_lur_lock.get()=='Lock both'): #Use the local variable and def_lur_lock to lock lure as active even after it is set to 0 by clear_inputs()
     lured.set(1)
 clear_btn.configure(command=clear_inputs)
 window.bind('<'+keybinds.reset.key+'>',clear_inputs)
@@ -455,70 +445,41 @@ def cog_health_ind_calc():
 global v2_dmg
 v2_dmg=0
 
-def v2_calc():
-  lvl=0
-  while lvl<20:
-    local_lure=0
-    if lured.get()==1:
-      local_lure=1
-    lvl=lvl+1
-    global v2_dmg
-    v2_dmg=0
-    #print("Evaluating lvl: "+str(lvl))
-    
-    if len(trp_used)==1 and lured.get()==1:
-      v2_dmg=v2_dmg+calculators.gag_calculator(trp_used,plating=lvl)
-      lured.set(0)
-    if len(snd_used)>0:
-      v2_dmg=v2_dmg+calculators.gag_calculator(snd_used,plating=lvl)
-      lured.set(0)
-    if len(trw_used)>0:
-      v2_dmg=v2_dmg+calculators.gag_calculator(trw_used,lured=lured.get(),plating=lvl)
-      lured.set(0)
-    if len(sqt_used)>0:
-      v2_dmg=v2_dmg+calculators.gag_calculator(sqt_used,lured=lured.get(),plating=lvl)
-      lured.set(0)
-    if len(drp_used)>0 and lured.get()==0:
-      v2_dmg=v2_dmg+calculators.gag_calculator(drp_used,plating=lvl)
-    
-    if local_lure==1:
-      lured.set(1)
-    
-    if v2_dmg==calculators.cog_health(lvl):
-      #print("Wow! We found the level!")
-      #print("The level is: "+str(lvl))
-      cog_level_indicator.configure(text="(v2.0 level "+str(lvl)+")")
-      dmg_indicator.configure(text=str(v2_dmg))
-      break
-    elif v2_dmg<calculators.cog_health(lvl):
-      #print("Wow! We found the level!")
-      lvl=lvl-1
-      #print("The level is: "+str(lvl))
-      v2_dmg=0
-      if len(trp_used)==1 and lured.get()==1:
-        v2_dmg=v2_dmg+calculators.gag_calculator(trp_used,plating=lvl)
-        lured.set(0)
-      if len(snd_used)>0:
-        v2_dmg=v2_dmg+calculators.gag_calculator(snd_used,plating=lvl)
-        lured.set(0)
-      if len(trw_used)>0:
-        v2_dmg=v2_dmg+calculators.gag_calculator(trw_used,lured=lured.get(),plating=lvl)
-        lured.set(0)
-      if len(sqt_used)>0:
-        v2_dmg=v2_dmg+calculators.gag_calculator(sqt_used,lured=lured.get(),plating=lvl)
-        lured.set(0)
-      if len(drp_used)>0 and lured.get()==0:
-        v2_dmg=v2_dmg+calculators.gag_calculator(drp_used,plating=lvl)
-      cog_level_indicator.configure(text="(v2.0 level "+str(lvl)+")")
-      dmg_indicator.configure(text=str(v2_dmg))
-      break
-    elif lvl==20 and v2_dmg>calculators.cog_health(lvl):
-      #print("Wow! We found the level!")
-      #print("The level is: "+str(lvl))
-      cog_level_indicator.configure(text="(v2.0 level "+str(lvl)+")")
-      dmg_indicator.configure(text=str(v2_dmg))
-    if local_lure==1:
-      lured.set(1)
+def v2_calc(lvl):
+  local_lure=0
+  if lured.get()==1:
+    local_lure=1
+  global v2_dmg
+  global v2_dmgs
+  v2_dmg=0
+  #print("Evaluating lvl: "+str(lvl))
+  
+  if len(trp_used)==1 and lured.get()==1:
+    v2_dmg=v2_dmg+calculators.gag_calculator(trp_used,plating=lvl)
+    lured.set(0)
+  if len(snd_used)>0:
+    v2_dmg=v2_dmg+calculators.gag_calculator(snd_used,plating=lvl)
+    lured.set(0)
+  if len(trw_used)>0:
+    v2_dmg=v2_dmg+calculators.gag_calculator(trw_used,lured=lured.get(),plating=lvl)
+    lured.set(0)
+  if len(sqt_used)>0:
+    v2_dmg=v2_dmg+calculators.gag_calculator(sqt_used,lured=lured.get(),plating=lvl)
+    lured.set(0)
+  if len(drp_used)>0 and lured.get()==0:
+    v2_dmg=v2_dmg+calculators.gag_calculator(drp_used,plating=lvl)
+  
+  if local_lure==1:
+    lured.set(1)
+  
+  if lvl==9:
+    v2_dmgs[0]=v2_dmg
+  elif lvl==10:
+    v2_dmgs[1]=v2_dmg
+  elif lvl==11:
+    v2_dmgs[2]=v2_dmg
+  elif lvl==12:
+    v2_dmgs[3]=v2_dmg
 
 #Toolbar
 toolbar=Menu(window)
@@ -541,9 +502,10 @@ lur_check.grid(column=0,row=0,padx=5)
 org_btn.grid(column=1,row=0,padx=5)
 def_lbl.grid(column=2,row=0,padx=0)
 def_btn.grid(column=3,row=0)
+def_btn.configure(state="disabled")
 def_lur_dropdown.grid(column=1,row=1)
 clear_btn.grid(column=2,row=1,columnspan=2,padx=5)
-v2_check.grid(column=0,row=1)
+#v2_check.grid(column=0,row=1)
 
 #Geometry - Gags
 gag_frame.grid(column=0,row=2,pady=10)
@@ -602,9 +564,9 @@ cog_calc.grid(column=0,row=4,pady=3)
 
 #Geometry - Calculation Results
 calc_results.grid(column=0,row=0)
-dmg_this_round.grid(column=0,row=0)
+#dmg_this_round.grid(column=0,row=0)
 dmg_indicator.grid(column=1,row=0)
-cog_level_indicator.grid(column=2,row=0)
+#cog_level_indicator.grid(column=2,row=0)
 org_indicator.grid(column=0,row=1,columnspan=3)
 
 #Run

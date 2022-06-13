@@ -1,0 +1,12 @@
+- Replaced standard damage indicator with damage values for 2.0 Cogs level 9-12
+- Removed or disabled standard damage value calculation, defense values, and the v2 toggle
+- DO NOT MERGE! THIS IS NOT INTENDED AS A REPLACEMENT! This is simply a proof of concept/temporary solution
+- If this functionality is to be added to the actual calculator, reworking the code is necessary to prevent conflicting with existing features
+
+
+--In depth description: the 2.0 teamwork bug--
+- In the original version of the calculator, the calculators.py module will refuse to append a damage value equal to or less than 0
+- While this is accurate for base damage, this is inaccurate regarding game mechanics
+- Using, for example, a squirting flower on a level 9 2.0 would obviously do 0 damage, but by using it alongside a stronger gag such as storm cloud, it still allows the storm to trigger the 20% teamwork bonus
+- Because this 0 damage value for squirting flower is not being appended, it is unable to calculate the bonus damage for the storm cloud in such situations, resulting in inaccurate calculations
+- This dedicated version has fixed this bug by adding a section to reinforced_plating in calculators.py that allows it to append damages as 0
