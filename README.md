@@ -10,4 +10,17 @@ Save this version in a separate directory if you wish to use this
 This version also fixes a calculation bug relating to teamwork damage with low level gags on 2.0 Cogs. Check the "differences_from_original.txt" file for an in depth description  
  
 Before anyone says anything, I am aware the code here is sloppy and poorly made  
-This is intended as a temporary solution and proof of concept, so the approaches made are very volatile and poor practice. Do not use this as example of good code
+This is intended as a temporary solution and proof of concept, so the approaches made are very volatile and poor practice. Do not use this as example of good code  
+
+# TOMLI INSTALL INSTRUCTIONS
+If the calculator does not open when trying to run main.py, you most likely do not have tomli installed  
+To install tomli, do the following (instructions copied from [here](https://stackoverflow.com/questions/27409192/install-python-modules-package-using-idle-on-windows)):  
+**Windows**  
+At the command prompt enter  
+
+py -3 -m pip install tomli  
+
+**Linux**  
+At the terminal enter  
+
+sudo python3 -m pip install tomli  
